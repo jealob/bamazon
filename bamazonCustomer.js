@@ -17,5 +17,17 @@ let connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+    inStock();
     connection.end();
 });
+
+function inStock() {
+    connection.query("SELECT item_id, product_name, price FROM products",
+        function (error, response) {
+            console.log("Products in Stock");
+            console.log("==================");
+            for (let element in response) {
+                console.log(`${response[element].item_id} | ${response[element].product_name} | $${response[element].price}`);
+            }
+        });
+}
