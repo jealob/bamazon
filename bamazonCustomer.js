@@ -18,15 +18,15 @@ const connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    runBamazon();
+    runBamazonCustomer();
 });
 
 // Displays all Products in stock
-function runBamazon() {
+function runBamazonCustomer() {
+    console.log("\nWelcome to Bamazon\n------------------\n");
+    console.log("Products in Stock");
+    console.log("==================");
     connection.query("SELECT item_id, product_name, price FROM products", function (error, response) {
-        console.log("\nWelcome to Bamazon\n------------------\n");
-        console.log("Products in Stock");
-        console.log("==================");
         for (let element in response) {
             console.log(`${response[element].item_id} | ${response[element].product_name} | $${response[element].price}`);
         }
@@ -55,7 +55,6 @@ function getUserInfo() {
 // Get a specific product by id
 function getProduct(answer) {
     connection.query("SELECT stock_quantity FROM products WHERE ?", [{ item_id: answer.item_id }], (error, getProductResponse) => {
-        getProductResponse;
         let stocked = getProductResponse[0].stock_quantity;
         let purchased = answer.quantity;
         let productID = answer.item_id;
@@ -63,7 +62,6 @@ function getProduct(answer) {
             console.log(`Insufficient quantity, you can only order ${qty} piece(s) at this time.`);
         }
         else {
-            console.log("Updating Stock...");
             let remainingStock = stocked - purchased;
             recordTransaction(productID, purchased, remainingStock);
         }
@@ -71,9 +69,10 @@ function getProduct(answer) {
 }
 
 function recordTransaction(id, qty, remain) {
-    console.log("Updated Stock\nPrinting Receipt...");
+    console.log("\nPrinting Receipt...");
     connection.query("SELECT product_name, price FROM products WHERE ?", [{ item_id: id }], (error, recordTransactionResponse) => console.log(`Purchased: ${recordTransactionResponse[0].product_name}, \nQuantity: ${qty} piece(s), \nPrice: $${recordTransactionResponse[0].price}, \nTotal: $${(qty * recordTransactionResponse[0].price).toFixed(2)}`));
-    updateStock(id, remain)
+    console.log("\nUpdating Stock...");
+    updateStock(id, remain);
 }
 
 function updateStock(id, remain) {
@@ -81,5 +80,6 @@ function updateStock(id, remain) {
         { stock_quantity: remain },
         { item_id: id }
     ]);
+    console.log("Updated Stock");
     connection.end();
 }
