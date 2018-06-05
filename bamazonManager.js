@@ -127,6 +127,7 @@ function updateStock() {
     });
 }
 
+// Add a new product
 function addNewProduct() {
     console.log("\n\nAdd to Product Stock\n------------------\n");
     inquirer.prompt([
@@ -160,6 +161,7 @@ function addNewProduct() {
         console.log("Adding New Product...");
         let full_stock = parseInt(newProduct.full_stock);
         let present_stock = parseInt(newProduct.stock_quantity);
+        // Check if product space capacity >= quantity user is adding
         if (present_stock <= full_stock) {
             connection.query("INSERT INTO products SET ?",
                 {
@@ -167,7 +169,8 @@ function addNewProduct() {
                     department_name: newProduct.department_name,
                     price: newProduct.price,
                     stock_quantity: newProduct.stock_quantity,
-                    full_stock: newProduct.full_stock
+                    full_stock: newProduct.full_stock,
+                    stock_percent: present_stock * 100 / full_stock
                 }, (error, addProductResponse) => {
                     console.log("\nNew Product added");
                     getProducts();
@@ -179,18 +182,3 @@ function addNewProduct() {
         }
     });
 }
-
- // validate: function (input) {
-                    //     // Declare function as asynchronous, and save the done callback
-                    //     var done = this.async();
-
-                    //     // Do async stuff
-                    //     setTimeout(function () {
-                    //         if (typeof (parseInt(input)) !== 'number') {
-                    //             // Pass the return value in the done callback
-                    //             done('You need to provide a number');
-                    //             return false;
-                    //         }
-                    //         done(null, true);
-                    //     }, 3000);
-                    // }
