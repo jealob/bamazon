@@ -33,6 +33,7 @@ function runBamazonCustomer() {
         getUserInfo();
     });
 }
+
 // Get Users input information
 function getUserInfo() {
     // Creates Prompt
@@ -54,32 +55,58 @@ function getUserInfo() {
 
 // Get a specific product by id
 function getProduct(answer) {
-    connection.query("SELECT stock_quantity FROM products WHERE ?", [{ item_id: answer.item_id }], (error, getProductResponse) => {
-        let stocked = getProductResponse[0].stock_quantity;
-        let purchased = answer.quantity;
-        let productID = answer.item_id;
-        if (purchased > stocked) {
+    connection.query("SELECT * FROM products WHERE ?", [{ item_id: answer.item_id }], (error, getProductResponse) => {
+        let product = {
+            id: getProductResponse[0].item_id,
+            name: getProductResponse[0].product_name,
+            department: getProductResponse[0].department_name,
+            price: parseFloat(getProductResponse[0].price),
+            stocked: parseInt(getProductResponse[0].stock_quantity),
+            shelfCapacity: parseInt(getProductResponse[0].full_stock),
+            stockPercent: parseInt(getProductResponse[0].stock_percent),
+            productSales: parseFloat(getProductResponse[0].product_sales)
+        };
+        let buying = {
+            quantity: answer.quantity,
+            id: answer.item_id
+        }
+        if (buying.quantity > product.stocked) {
             console.log(`Insufficient quantity, you can only order ${qty} piece(s) at this time.`);
         }
         else {
-            let remainingStock = stocked - purchased;
-            recordTransaction(productID, purchased, remainingStock);
+            processTransaction(buying, product);
         }
     });
 }
-
-function recordTransaction(id, qty, remain) {
+// Processes Customer Receipt
+function processTransaction(buying, product) {
+    let receivingDepartment;
     console.log("\nPrinting Receipt...");
-    connection.query("SELECT product_name, price FROM products WHERE ?", [{ item_id: id }], (error, recordTransactionResponse) => console.log(`Purchased: ${recordTransactionResponse[0].product_name}, \nQuantity: ${qty} piece(s), \nPrice: $${recordTransactionResponse[0].price}, \nTotal: $${(qty * recordTransactionResponse[0].price).toFixed(2)}`));
-    console.log("\nUpdating Stock...");
-    updateStock(id, remain);
+    buying.total = buying.quantity * product.price.toFixed(2);
+    console.log(`
+        Purchased: ${product.name},
+        Quantity: ${buying.quantity} piece(s),
+        Price: $${product.price},
+        nTotal: $${buying.total}
+        `);
+    updateTransaction(buying, product);
 }
 
-function updateStock(id, remain) {
+function updateTransaction(buying, product) {
+    // update stock
+    product.stocked -= buying.quantity;
+    // Update sales total
+    console.log("\nUpdating Stock...");
+    product.productSales += buying.total;
+    console.log(product);
     connection.query("UPDATE products SET ? WHERE ?", [
-        { stock_quantity: remain },
-        { item_id: id }
-    ]);
-    console.log("Updated Stock");
+        {
+            product_sales: product.productSales,
+            stock_quantity: product.stocked
+        },
+        { department_name: product.department }
+    ], (error, updateTransactionResponse) => {
+        console.log(`\n${updateTransactionResponse.affectedRows} Stock Updated`);
+    });
     connection.end();
 }

@@ -13,7 +13,21 @@ primary key (item_id)
 );
 
 use bamazon;
-use products;
+
 alter table products
 add stock_percent integer(3);
 update products set stock_percent = stock_quantity*100/full_stock;
+
+create table departments as select distinct department_name from products order by department_name;
+
+alter table departments
+add column department_id integer(5) auto_increment primary key first,
+add over_head_cost decimal(10, 2);
+
+alter table departments auto_increment = 230001;
+
+alter table products
+drop product_sales;
+
+alter table products
+add product_sales decimal(10,2);
