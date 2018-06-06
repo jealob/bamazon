@@ -4,9 +4,11 @@
   "description": "",
   "main": "bamazonCustomer.js",
   "dependencies": {
+    "console.table": "^0.10.0",
     "dotenv": "^6.0.0",
     "inquirer": "^6.0.0",
-    "mysql": "^2.15.0"
+    "mysql": "^2.15.0",
+    "table": "^4.0.3"
   },
   "devDependencies": {},
   "scripts": {

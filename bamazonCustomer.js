@@ -3,6 +3,7 @@ const mysql = require("mysql");
 require('dotenv').config();
 const db = require("./keys.js").Database;
 const inquirer = require("inquirer");
+const cTable = require('console.table');
 
 // Create Connections
 const connection = mysql.createConnection({
@@ -37,7 +38,7 @@ function runBamazonCustomer() {
 // Get Users input information
 function getUserInfo() {
     // Creates Prompt
-    console.log("\n\nBuy your favorite product\n------------------\n");
+    console.log("\n\nOrder Product\n-------------\n");
     inquirer.prompt([
         {
             type: "input",
@@ -50,12 +51,28 @@ function getUserInfo() {
             name: "quantity",
             // validate
         },
-    ]).then(answer => getProduct(answer));
+    ]).then(answer => {
+        let buying = {
+            id: parseInt(answer.item_id),
+            quantity: parseFloat(answer.quantity)
+        }
+        if (isNaN(buying.id)) {
+            console.log(`Invalid Product ID, please enter a number.`);
+            getUserInfo();
+        }
+        else if (isNaN(buying.quantity)) {
+            console.log(`Invalid Quantity, please enter a number.`);
+            getUserInfo();
+        }
+        else {
+            getProduct(buying);
+        }
+    });
 }
 
 // Get a specific product by id
-function getProduct(answer) {
-    connection.query("SELECT * FROM products WHERE ?", [{ item_id: answer.item_id }], (error, getProductResponse) => {
+function getProduct(buying) {
+    connection.query("SELECT * FROM products WHERE ?", [{ item_id: buying.id }], (error, getProductResponse) => {
         let product = {
             id: getProductResponse[0].item_id,
             name: getProductResponse[0].product_name,
@@ -66,18 +83,18 @@ function getProduct(answer) {
             stockPercent: parseInt(getProductResponse[0].stock_percent),
             productSales: parseFloat(getProductResponse[0].product_sales)
         };
-        let buying = {
-            quantity: answer.quantity,
-            id: answer.item_id
-        }
-        if (buying.quantity > product.stocked) {
-            console.log(`Insufficient quantity, you can only order ${qty} piece(s) at this time.`);
+
+        if (buying.quantity < product.stocked) {
+            processTransaction(buying, product);
         }
         else {
-            processTransaction(buying, product);
+            console.log(`Insufficient quantity, you can only order at most ${product.stocked} piece(s) at this time.`);
+            connection.end();
+            getUserInfo();
         }
     });
 }
+
 // Processes Customer Receipt
 function processTransaction(buying, product) {
     let receivingDepartment;
@@ -87,7 +104,7 @@ function processTransaction(buying, product) {
         Purchased: ${product.name},
         Quantity: ${buying.quantity} piece(s),
         Price: $${product.price},
-        nTotal: $${buying.total}
+        Total: $${buying.total}
         `);
     updateTransaction(buying, product);
 }
@@ -95,18 +112,20 @@ function processTransaction(buying, product) {
 function updateTransaction(buying, product) {
     // update stock
     product.stocked -= buying.quantity;
+    product.stockPercent = product.stocked*100/product.shelfCapacity;
+    
     // Update sales total
     console.log("\nUpdating Stock...");
     product.productSales += buying.total;
-    console.log(product);
     connection.query("UPDATE products SET ? WHERE ?", [
         {
             product_sales: product.productSales,
-            stock_quantity: product.stocked
+            stock_quantity: product.stocked,
+            stock_percent: product.stockPercent
         },
-        { department_name: product.department }
+        { item_id: product.id }
     ], (error, updateTransactionResponse) => {
-        console.log(`\n${updateTransactionResponse.affectedRows} Stock Updated`);
+        console.log(`Stock Updated`);
     });
     connection.end();
 }

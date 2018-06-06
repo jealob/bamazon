@@ -35,9 +35,8 @@ function runBamazonManager() {
                 "Add New Product"],
             name: "options"
         }
-    ]).then(productQty => {
-        let action = productQty.options;
-        switch (action) {
+    ]).then(answer => {
+        switch (answer.options) {
             case "View Products for Sale":
                 getProducts();
                 break;
@@ -51,7 +50,6 @@ function runBamazonManager() {
             case "Add New Product":
                 addNewProduct();
                 break;
-
         }
     });
 }
@@ -145,8 +143,7 @@ function addNewProduct() {
             type: "input",
             message: "Please Enter Product Price",
             name: "price"
-        }
-        ,
+        },
         {
             type: "input",
             message: "Please Enter Product Stock Quantity",

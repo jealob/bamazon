@@ -40,3 +40,8 @@ update departments set over_head_cost = 58644 where department_id = 230003;
 update departments set over_head_cost = 10489 where department_id = 230004;
 
 update products set product_sales = 0.0;
+
+delete from departments where department_id = 230007;
+
+update products set price = 20.45 where item_id = 19;
+update products set product_sales = 0.00 where item_id = 19;
