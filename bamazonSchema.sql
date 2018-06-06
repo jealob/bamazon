@@ -31,3 +31,6 @@ drop product_sales;
 
 alter table products
 add product_sales decimal(10,2);
+
+alter table products
+drop column stock_percent;

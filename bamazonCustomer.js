@@ -18,7 +18,7 @@ const connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
+    // console.log("connected as id " + connection.threadId + "\n");
     runBamazonCustomer();
 });
 
@@ -28,9 +28,7 @@ function runBamazonCustomer() {
     console.log("Products in Stock");
     console.log("==================");
     connection.query("SELECT item_id, product_name, price FROM products", function (error, response) {
-        for (let element in response) {
-            console.log(`${response[element].item_id} | ${response[element].product_name} | $${response[element].price}`);
-        }
+        console.table(response);
         getUserInfo();
     });
 }
@@ -84,12 +82,11 @@ function getProduct(buying) {
             productSales: parseFloat(getProductResponse[0].product_sales)
         };
 
-        if (buying.quantity < product.stocked) {
+        if (buying.quantity <= product.stocked) {
             processTransaction(buying, product);
         }
         else {
             console.log(`Insufficient quantity, you can only order at most ${product.stocked} piece(s) at this time.`);
-            connection.end();
             getUserInfo();
         }
     });
@@ -112,8 +109,6 @@ function processTransaction(buying, product) {
 function updateTransaction(buying, product) {
     // update stock
     product.stocked -= buying.quantity;
-    product.stockPercent = product.stocked*100/product.shelfCapacity;
-    
     // Update sales total
     console.log("\nUpdating Stock...");
     product.productSales += buying.total;
@@ -121,7 +116,6 @@ function updateTransaction(buying, product) {
         {
             product_sales: product.productSales,
             stock_quantity: product.stocked,
-            stock_percent: product.stockPercent
         },
         { item_id: product.id }
     ], (error, updateTransactionResponse) => {

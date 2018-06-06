@@ -27,21 +27,22 @@ values("Children Toys", 250404),
 ("Hardware", 250965),
 ("Medicine", 291019);
 
-update departments set over_head_cost = 23434 where department_id = 1;
-update departments set over_head_cost = 19343 where department_id = 2;
-update departments set over_head_cost = 63434 where department_id = 3;
-update departments set over_head_cost = 44777 where department_id = 4;
-update departments set over_head_cost = 34564 where department_id = 5;
-update departments set over_head_cost = 10489 where department_id = 6;
-update departments set over_head_cost = 58644 where department_id = 7;
-update departments set over_head_cost = 34564 where department_id = 230001;
-update departments set over_head_cost = 10489 where department_id = 230002;
-update departments set over_head_cost = 58644 where department_id = 230003;
-update departments set over_head_cost = 10489 where department_id = 230004;
-
 update products set product_sales = 0.0;
 
 delete from departments where department_id = 230007;
 
 update products set price = 20.45 where item_id = 19;
 update products set product_sales = 0.00 where item_id = 19;
+update products set product_name = "Rice (20oz)" where item_id = 14;
+
+update departments set over_head_cost = 3434 where department_id = 1;
+update departments set over_head_cost = 9343 where department_id = 2;
+update departments set over_head_cost = 3434 where department_id = 3;
+update departments set over_head_cost = 4777 where department_id = 4;
+update departments set over_head_cost = 4564 where department_id = 5;
+update departments set over_head_cost = 2489 where department_id = 6;
+update departments set over_head_cost = 8644 where department_id = 7;
+update departments set over_head_cost = 4564 where department_id = 230001;
+update departments set over_head_cost = 3489 where department_id = 230002;
+update departments set over_head_cost = 8644 where department_id = 230003;
+update departments set over_head_cost = 10489 where department_id = 230004;
