@@ -99,7 +99,6 @@ function updateStock() {
                     stocked: parseInt(getProductsResponse[0].stock_quantity),
                     shelfCapacity: parseInt(getProductsResponse[0].full_stock)
                 }
-                console.log(product);
                 // Alert user to not add more than required quantity
                 console.log(`Must Enter quantity not more than ${product.shelfCapacity - product.stocked}`);
                 inquirer.prompt([
@@ -169,21 +168,26 @@ function addNewProduct() {
                 message: "Please Enter Shelf Capacity for Product",
                 name: "full_stock"
             }
-        ]).then(newProduct => {
+        ]).then(answer => {
             console.log("Adding New Product...");
-            let full_stock = parseInt(newProduct.full_stock);
-            let present_stock = parseInt(newProduct.stock_quantity);
+            let product = {
+                name: answer.product_name,
+                department_name: answer.department_name,
+                price: answer.price,
+                stocked: parseInt(answer.stock_quantity),
+                shelfCapacity: parseInt(answer.full_stock)
+            };
             // Check if product space capacity >= quantity user is adding
-            if (present_stock <= full_stock) {
-                connection.query("INSERT INTO products SET ?",
+            console.log(product);
+            if (product.stocked <= product.shelfCapacity) {
+                connection.query("INSERT INTO products SET ?",[
                     {
-                        product_name: newProduct.product_name,
-                        department_name: newProduct.department_name,
-                        price: newProduct.price,
-                        stock_quantity: newProduct.stock_quantity,
-                        full_stock: newProduct.full_stock,
-                        stock_percent: present_stock * 100 / full_stock
-                    }, (error, addProductResponse) => {
+                        product_name: product.name,
+                        department_name: product.department_name,
+                        price: product.price,
+                        stock_quantity: product.stocked,
+                        full_stock: product.shelfCapacity
+                    }], (error, addProductResponse) => {
                         console.log("\nNew Product added");
                         getProducts();
                     });
