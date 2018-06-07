@@ -109,9 +109,11 @@ function updateStock() {
                     }
                 ]).then(answer => {
                     console.log("Updating Stock...");
-                    product.stocked += parseInt(answer.quantity);
+                    let quantity = 0.0;
+                    quantity += parseInt(answer.quantity);
                     // Check if user added more than required quantity
-                    if (product.stocked <= product.shelfCapacity) {
+                    if ((product.stocked + quantity) <= product.shelfCapacity) {
+                        product.stocked += quantity;
                         connection.query("UPDATE products SET ? WHERE ?", [
                             {
                                 stock_quantity: product.stocked,
@@ -134,7 +136,7 @@ function updateStock() {
 
 // Add a new product
 function addNewProduct() {
-    console.log("\n\nAdd to Product Stock\n------------------\n");
+    console.log("\n\nAdd a New Product Stock\n------------------\n");
     // An array to hold all current departments
     let departments = [];
     connection.query("SELECT department_name FROM departments", (error, response) => {
@@ -194,8 +196,8 @@ function addNewProduct() {
                     });
             }
             else {
-                console.log(`Quantity is more than the required full stock, requires less than ${full_stock - present_stock} pieces`);
-                getProducts();
+                console.log(`Quantity is more than the required Shelf Capacity, Please make sure that stocked is less than or equals shelf capacity`);
+                addNewProduct();
             }
         });
     });
