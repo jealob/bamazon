@@ -1,10 +1,13 @@
 # bamazon
+Bamazon is a node CLi app that takes orders check if there is products exist and if quantity is enough and then process the order.
+Managers can add new products, add stock, view products with low cost
+Supervisors can New department and view department sales and total profit.
+Note app Validates sensitive category to ensure smooth running of program.
 
+Step by Step Design and Implementation are as follows:
 Create a MySQL Database called bamazon.
 Then create a Table inside of that database called products.
 The products table should have each of the following columns:
-
-
 
 item_id (unique id for each product)
 product_name (Name of product)
