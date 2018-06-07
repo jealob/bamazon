@@ -175,10 +175,10 @@ function addNewProduct() {
                 department_name: answer.department_name,
                 price: answer.price,
                 stocked: parseInt(answer.stock_quantity),
-                shelfCapacity: parseInt(answer.full_stock)
+                shelfCapacity: parseInt(answer.full_stock),
+                sales: 0
             };
             // Check if product space capacity >= quantity user is adding
-            console.log(product);
             if (product.stocked <= product.shelfCapacity) {
                 connection.query("INSERT INTO products SET ?",[
                     {
@@ -186,7 +186,8 @@ function addNewProduct() {
                         department_name: product.department_name,
                         price: product.price,
                         stock_quantity: product.stocked,
-                        full_stock: product.shelfCapacity
+                        full_stock: product.shelfCapacity,
+                        product_sales: product.sales
                     }], (error, addProductResponse) => {
                         console.log("\nNew Product added");
                         getProducts();
