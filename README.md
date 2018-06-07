@@ -31,7 +31,6 @@ However, if store does have enough of the product, should fulfill the customer's
 This means updating the SQL database to reflect the remaining quantity.
 Once the update goes through, show the customer the total cost of their purchase.
 
-
 Create a new Node application called bamazonManager.js. Running this application will:
 List a set of menu options:
 View Products for Sale
@@ -42,8 +41,6 @@ If a manager selects View Products for Sale, the app should list every available
 If a manager selects View Low Inventory, then it should list all items with an inventory count lower than five.
 If a manager selects Add to Inventory, app should display a prompt that will let the manager "add more" of any item currently in the store.
 If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
-
-If finished Challenge #2 and put in all the hours were willing to spend on this activity, then rest easy! Otherwise continue to the next and final challenge.
 
 Create a new MySQL table called departments. table should include the following columns:
 
